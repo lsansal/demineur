@@ -181,12 +181,14 @@ let affiche_fin gagne temps =
   if gagne then begin
     let texte = (String.cat (String.cat "GAGNE ! Temps : " (string_of_int temps)) " secondes.") in
     let taille_x, taille_y = text_size texte in
+    set_color black;
     moveto ((size_x () - taille_x) / 2) ((size_y () - taille_y) / 2);
     draw_string texte;
   end
   else begin
     let texte = "GAME OVER." in
     let taille_x, taille_y = text_size texte in
+    set_color black;
     moveto ((size_x () - taille_x) / 2) ((size_y () - taille_y) / 2);
     draw_string texte;
   end;;
@@ -215,7 +217,7 @@ let () =
         charge_interface !score !etat_jeu t_init;
       end;
       if !score < 0 then etat := Perdu
-      else if !score = 241 then etat := Gagne;
+      else if !score >= 241 then etat := Gagne;
       if (button_down ()) then begin
         let x_i, y_i, i_x, i_y = coordonnees_quadrillage ()
         and pos_x, pos_y = (mouse_pos ()) in
@@ -228,7 +230,7 @@ let () =
   done;
   while !etat <> EnCours do
     match !etat with
-    | Gagne -> affiche_fin true (!t-t_init); attends_fermeture ();
     | Perdu -> affiche_fin false !t; attends_fermeture ();
+    | Gagne -> affiche_fin true (!t-t_init); attends_fermeture ();
   done;;
 
