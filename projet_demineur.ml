@@ -1,8 +1,3 @@
-#use "topfind";;
-
-#require "graphics.cma";;
-#require "unix.cma";;
-open Unix;;
 open Graphics;;
 open Random;;
 open_graph " 600x700";;
@@ -196,6 +191,10 @@ let affiche_fin gagne temps =
     draw_string texte;
   end;;
 
+let rec attends_fermeture () =
+  let e = wait_next_event [Button_down ; Key_pressed] in
+  if not e.keypressed && e.button then attends_fermeture ();;
+
 let () =
   let etat = ref EnCours
   and t = ref (int_of_float (Unix.gettimeofday ()))
@@ -227,7 +226,9 @@ let () =
         charge_interface !score !etat_jeu t_init;
       end;
   done;
-  match !etat with
-  | Gagne -> affiche_fin true (!t-t_init)
-  | Perdu -> affiche_fin false !t;;
+  while !etat <> EnCours do
+    match !etat with
+    | Gagne -> affiche_fin true (!t-t_init); attends_fermeture ();
+    | Perdu -> affiche_fin false !t; attends_fermeture ();
+  done;;
 
